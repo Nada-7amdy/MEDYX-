@@ -1,0 +1,22 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const C = o => o.click({force:true});
+const p = await (await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2})).newPage();
+const ov = () => p.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+1);
+await p.goto('http://localhost:8787',{waitUntil:'domcontentloaded'}); await p.waitForTimeout(1500);
+console.log('closed overflow:', await ov());
+await p.screenshot({path:'/tmp/p-mob-closed.png'});
+await C(p.getByRole('button',{name:/Open MEDYX/i})); await p.waitForTimeout(1300);
+console.log('roles overflow:', await ov());
+await p.screenshot({path:'/tmp/q-mob-roles.png'});
+await C(p.getByRole('button',{name:/^Pharmacy —/})); await p.waitForTimeout(1000);
+await C(p.getByRole('button',{name:/New pharmacy\? Create an account/})); await p.waitForTimeout(1000);
+console.log('signup overflow:', await ov());
+await p.screenshot({path:'/tmp/r-mob-signup.png', fullPage:true});
+// tablet
+const t = await (await b.newContext({viewport:{width:834,height:1112}})).newPage();
+await t.goto('http://localhost:8787',{waitUntil:'domcontentloaded'}); await t.waitForTimeout(1400);
+await C(t.getByRole('button',{name:/Open MEDYX/i})); await t.waitForTimeout(1300);
+console.log('tablet overflow:', await t.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+1));
+await t.screenshot({path:'/tmp/s-tablet.png'});
+await b.close();
